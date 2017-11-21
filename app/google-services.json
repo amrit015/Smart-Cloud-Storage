@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "709258600882",
+    "firebase_url": "https://smartcloudstorage-017.firebaseio.com",
+    "project_id": "smartcloudstorage-017",
+    "storage_bucket": "smartcloudstorage-017.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709258600882:android:79a6d3b8838237fa",
+        "android_client_info": {
+          "package_name": "com.amrit.smartcloudstorage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "709258600882-ksmpdk40979bfbd1sratreg8h0lod34p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.amrit.smartcloudstorage",
+            "certificate_hash": "4aaa726bb4dde8f182e9ffc89eb24b29af5c20e7"
+          }
+        },
+        {
+          "client_id": "709258600882-5ekgcs0s159ni9ab91q35um0364f4hjq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbHZ6I1fA94HJx3zWQrTCV9uabVH-Byh0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709258600882-5ekgcs0s159ni9ab91q35um0364f4hjq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
