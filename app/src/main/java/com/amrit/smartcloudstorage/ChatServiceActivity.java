@@ -46,14 +46,12 @@ public class ChatServiceActivity extends AppCompatActivity {
         final String email = getIntent().getStringExtra("user");
         Log.i("ChatServiceActivity", "email : "+ email);
 
-//        DatabaseReference.setAndroidContext(this);
-//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         reference1 = FirebaseDatabase.getInstance()
-                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + "_");
+                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + "GroupChat");
 
-//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + UserDetails.username + "_" + UserDetails.chatWith);
+//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + ModuleParcelable.username + "_" + ModuleParcelable.chatWith);
 //        reference2 = FirebaseDatabase.getInstance()
-//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + UserDetails.chatWith + "_" + UserDetails.username);
+//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + ModuleParcelable.chatWith + "_" + ModuleParcelable.username);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +61,7 @@ public class ChatServiceActivity extends AppCompatActivity {
                 if(!messageText.equals("")){
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("message", messageText);
-                    map.put("user", UserDetails.getEmail());
+                    map.put("user", ModuleParcelable.getEmail());
                     reference1.push().setValue(map);
 //                    reference2.push().setValue(map);
                     messageArea.setText("");
@@ -78,11 +76,11 @@ public class ChatServiceActivity extends AppCompatActivity {
                 String message = map.get("message").toString();
                 String userName = map.get("user").toString();
 
-                if(userName.equals(UserDetails.getEmail())){
+                if(userName.equals(ModuleParcelable.getEmail())){
                     addMessageBox("You:-\n" + message, 1);
                 }
                 else{
-                    addMessageBox(UserDetails.chatWith + userName + "\n" + message, 2);
+                    addMessageBox(ModuleParcelable.chatWith + userName + "\n" + message, 2);
                 }
             }
 

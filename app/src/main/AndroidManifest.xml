@@ -26,6 +26,7 @@
         <activity android:name=".UserActivity"></activity>
         <activity android:name=".ChatServiceActivity"></activity>
         <activity android:name=".AllUsersActivity"></activity>
+        <activity android:name=".DownloadImagesActivity"></activity>
         <activity
             android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"
             android:theme="@style/MultipleImageSelectTheme">

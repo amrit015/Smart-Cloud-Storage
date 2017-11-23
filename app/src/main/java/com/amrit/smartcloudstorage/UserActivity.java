@@ -1,13 +1,9 @@
 package com.amrit.smartcloudstorage;
 
-import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.aditya.filebrowser.FileChooser;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
@@ -26,16 +23,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -45,13 +37,12 @@ import java.util.Map;
 public class UserActivity extends AppCompatActivity {
 
     Button chooseImg, uploadImg, downloadImg;
+    Button chooseDocu, uploadDocu;
     ImageView imgView;
     int PICK_IMAGE_REQUEST = 111;
     Uri filePath;
     ProgressDialog pd;
-    ArrayList<UserModule> userList = new ArrayList<UserModule>();
-    UserModule userModule;
-    UserDetails userDetails;
+    ModuleParcelable userDetails;
     ArrayList<Image> images;
 
     private FirebaseAuth.AuthStateListener authListener;
@@ -61,10 +52,12 @@ public class UserActivity extends AppCompatActivity {
     StorageReference storageRef = storage.getReferenceFromUrl("gs://smartcloudstorage-017.appspot.com");
     //creating reference to firebase database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference databaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com");
+    DatabaseReference databaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/StoragePhotoUrl/");
 
     String userId;
     FirebaseUser currentUser;
+    //this is the pic pdf code used in file chooser
+    final static int PICK_PDF_CODE = 2342;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +69,8 @@ public class UserActivity extends AppCompatActivity {
         chooseImg = (Button) findViewById(R.id.chooseImg);
         uploadImg = (Button) findViewById(R.id.uploadImg);
         downloadImg = (Button) findViewById(R.id.downloadImg);
+        chooseDocu = (Button) findViewById(R.id.chooseDocument);
+        uploadDocu = (Button) findViewById(R.id.uploadDocument);
         imgView = (ImageView) findViewById(R.id.imgView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floating_chat);
 
@@ -99,8 +94,6 @@ public class UserActivity extends AppCompatActivity {
         };
 
         // Creating new user node, which returns the unique key value
-        // new user node would be /users/$userid/
-        userId = databaseReference.push().getKey();
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userName = currentUser.getDisplayName();
@@ -119,19 +112,9 @@ public class UserActivity extends AppCompatActivity {
             }
         });
 
-
-        // creating user in database
-//        writeNewUser("Amrit008", "amrit008@gmail.com");
-        //writing in the user
-//        writeNewPost("Amrit", "Just a sample note");
-
         chooseImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.setType("image/*");
-//                intent.setAction(Intent.ACTION_PICK);
-//                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);
 
                 Intent intent = new Intent(UserActivity.this, AlbumSelectActivity.class);
                 //set limit on number of images that can be selected, default is 10
@@ -143,60 +126,20 @@ public class UserActivity extends AppCompatActivity {
         downloadImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StorageReference imageRef = storageRef.child("image.jpg");
-                try {
-                    final File localFile = File.createTempFile("images", "jpg");
-                    imageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                            imgView.setImageBitmap(bitmap);
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                        }
-                    });
-                } catch (IOException e) {
-                }
+                Intent intent = new Intent(UserActivity.this, DownloadImagesActivity.class);
+                startActivity(intent);
             }
         });
 
         uploadImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (filePath != null) {
-//                    pd.show();
-//
-//                    StorageReference childRef = storageRef.child("image.jpg");
-//
-//                    //uploading the image
-//                    UploadTask uploadTask = childRef.putFile(filePath);
-//
-//                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                        @Override
-//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                            pd.dismiss();
-//                            Toast.makeText(UserActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            pd.dismiss();
-//                            Toast.makeText(UserActivity.this, "Upload Failed -> " + e, Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                } else {
-//                    Toast.makeText(UserActivity.this, "Select an image", Toast.LENGTH_SHORT).show();
-//                }
-
                 final Uri[] uri=new Uri[images.size()];
                 for (int i =0 ; i < images.size(); i++) {
                     uri[i] = Uri.parse("file://"+images.get(i).path);
                     Log.i("UserActivity", "uri : "+ uri);
                     StorageReference ref = storageRef.child("Gallery/" + uri[i].getLastPathSegment());
-                    final String title = uri[i].getLastPathSegment();
+                    final String temp = uri[i].getLastPathSegment();
 
                     Log.i("UserActivity", "ref : " + ref);
                     ref.putFile(uri[i])
@@ -205,12 +148,12 @@ public class UserActivity extends AppCompatActivity {
                                 @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 String photoUrl = downloadUrl.toString();
                                 String email = userDetails.getEmail();
+                                String title = temp;
+
                                 if (photoUrl.length()>0){
-                                UserDetails userDetails = new UserDetails();
-                                    userDetails.photoTitle = title;
-                                    userDetails.photoUploader = email;
-                                    userDetails.photoUrl = photoUrl;
-                                    databaseReference.child("StoragePhotoUrl/").child(userId).setValue(userDetails);
+                                ModuleParcelable moduleParcelable = new ModuleParcelable(title,email,photoUrl);
+                                    userId = databaseReference.push().getKey();
+                                    databaseReference.child(userId).setValue(moduleParcelable);
                                 }
                                 Toast.makeText(UserActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                             }
@@ -223,38 +166,25 @@ public class UserActivity extends AppCompatActivity {
                         });
             } }
         });
+
+        chooseDocu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //creating an intent for file chooser
+                Intent intent = new Intent();
+                intent.setType("application/pdf");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_PDF_CODE);
+            }
+        });
+
+        uploadDocu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
-
-//    private void writeNewPost(String name, String note) {
-//        // Create new post at /user-posts/$userid/$postid and at
-//        // /posts/$postid simultaneously
-//        String key = mDatabase.child("posts").push().getKey();
-//        UserModule post = new UserModule(name, note);
-//        Map<String, Object> postValues = post.toMap();
-//
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        childUpdates.put("/user-posts/" + userId + "/" + key, postValues);
-//        mDatabase.updateChildren(childUpdates);
-//    }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-//            filePath = data.getData();
-//
-//            try {
-//                //getting image from gallery
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-//
-//                //Setting image to ImageView
-//                imgView.setImageBitmap(bitmap);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -262,12 +192,16 @@ public class UserActivity extends AppCompatActivity {
             //The array list has the image paths of the selected images
             images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
         }
-    }
+        if (requestCode == PICK_PDF_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            //if a file is selected
+            if (data.getData() != null) {
+                //uploading the file
+                Log.i("UserActivity","pdf data : "+ data.getData());
+            }else{
+                Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
+            }
+        }
 
-//    private void writeNewUser(String username, String email) {
-//        User user = new User(username, email);
-//
-//        mDatabase.child("users").child(userId).setValue(user);
-//    }
+    }
 
 }

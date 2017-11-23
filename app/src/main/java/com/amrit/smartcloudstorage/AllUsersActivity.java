@@ -67,7 +67,7 @@ public class AllUsersActivity extends AppCompatActivity {
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                UserDetails.chatWith = al.get(position);
+                ModuleParcelable.chatWith = al.get(position);
                 startActivity(new Intent(AllUsersActivity.this, ChatServiceActivity.class));
             }
         });
@@ -83,7 +83,7 @@ public class AllUsersActivity extends AppCompatActivity {
             while (i.hasNext()) {
                 key = i.next().toString();
 
-                if (!key.equals(UserDetails.email)) {
+                if (!key.equals(ModuleParcelable.email)) {
                     al.add(key);
                 }
 

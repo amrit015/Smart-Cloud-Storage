@@ -20,8 +20,21 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Choose Document"
+        android:id="@+id/chooseDocument"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Upload Image"
         android:id="@+id/uploadImg"/>
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upload Document"
+        android:id="@+id/uploadDocument"/>
 
     <Button
         android:layout_width="match_parent"
