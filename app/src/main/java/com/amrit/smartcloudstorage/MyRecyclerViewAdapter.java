@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -18,7 +17,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Amrit on 11/22/2017.
@@ -27,15 +25,20 @@ import java.util.List;
 class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.EventsHolder> {
     private static String LOG_TAG = "MyRecyclerViewAdapter";
     Context context;
-    PhotoModule photoModule;
-    private ArrayList<PhotoModule> mDataset;
+    ObjectModule objectModule;
+    private ArrayList<ObjectModule> mDataset;
     private String name;
     private int position;
     private String image;
 
-    public MyRecyclerViewAdapter(DownloadImagesActivity activity, ArrayList<PhotoModule> mDataset) {
+    public MyRecyclerViewAdapter(DownloadImagesActivity activity, ArrayList<ObjectModule> mDataset) {
         context = activity;
         this.mDataset = mDataset;
+    }
+
+    public MyRecyclerViewAdapter(DownloadFileActivity downloadFileActivity, ArrayList<ObjectModule> moduleList) {
+        context = downloadFileActivity;
+        this.mDataset = moduleList;
     }
 
     @Override
@@ -50,14 +53,16 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
     @Override
     public void onBindViewHolder(final EventsHolder holder, final int position) {
         // binding the views to display the name, description and user in the recyclerview
-        photoModule = mDataset.get(position);
-        if (!photoModule.getPhotoUrl().equals("")) {
-            Log.i("RecyclerViewAdapter","photoUrl: "+ photoModule.getPhotoUrl());
+        objectModule = mDataset.get(position);
+        if (!objectModule.getUrl().equals("")) {
+            Log.i("RecyclerViewAdapter","url: "+ objectModule.getUrl());
+            String getType = objectModule.getType();
+            Log.i("RecyclerView", "type :  "+ getType.substring(getType.lastIndexOf('/')+ 1));
             holder.progressBar.setVisibility(View.VISIBLE);
             //using Glide to load images
             Glide.clear(holder.storedImage);
             Glide.with(context)
-                    .load(photoModule.getPhotoUrl())
+                    .load(objectModule.getUrl())
                     .listener(new RequestListener<String, GlideDrawable>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {

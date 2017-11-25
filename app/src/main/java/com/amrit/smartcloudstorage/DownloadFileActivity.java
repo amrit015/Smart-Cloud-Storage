@@ -17,10 +17,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 /**
- * Created by Amrit on 11/21/2017.
+ * Created by Amrit on 11/24/2017.
  */
 
-public class DownloadImagesActivity extends AppCompatActivity {
+public class DownloadFileActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -39,7 +39,7 @@ public class DownloadImagesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download_images);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 //        mLayoutManager = new LinearLayoutManager(getActivity());
-        mGridLayoutManager = new GridLayoutManager(DownloadImagesActivity.this,2);
+        mGridLayoutManager = new GridLayoutManager(DownloadFileActivity.this,2);
         mRecyclerView.setHasFixedSize(false);
 //        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
@@ -49,7 +49,7 @@ public class DownloadImagesActivity extends AppCompatActivity {
 
     private void fetchImages() {
         final String userId = databaseReference.push().getKey();
-        DatabaseReference info = databaseReference.child("StoragePhotoUrl");
+        DatabaseReference info = databaseReference.child("FileStorage");
 
         info.addValueEventListener(new ValueEventListener() {
             @Override
@@ -59,11 +59,14 @@ public class DownloadImagesActivity extends AppCompatActivity {
                 //iterating through all the values in database
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     ObjectModule objectModule = postSnapshot.getValue(ObjectModule.class);
-                    Log.i("DownloadImageActivity", "results: " + objectModule.getUrl());
+
+                    Log.i("FileActivity", "FIle type: "+ objectModule);
+
+                    Log.i("DownloadFileActivity", "results: " + objectModule.getUrl());
                     moduleList.add(objectModule);
 //                    Log.i("DownloadImageActivity", "list: " + moduleList);
                 }
-                MyRecyclerViewAdapter mAdapter = new MyRecyclerViewAdapter(DownloadImagesActivity.this, moduleList);
+                MyRecyclerViewAdapter mAdapter = new MyRecyclerViewAdapter(DownloadFileActivity.this, moduleList);
                 mRecyclerView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
             }

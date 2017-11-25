@@ -1,6 +1,5 @@
 package com.amrit.smartcloudstorage;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.aditya.filebrowser.FileChooser;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
@@ -27,6 +25,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -37,13 +36,12 @@ import java.util.ArrayList;
 public class UserActivity extends AppCompatActivity {
 
     Button chooseImg, uploadImg, downloadImg;
-    Button chooseDocu, uploadDocu;
+    Button chooseFile, uploadFile, downloadFile;
     ImageView imgView;
-    int PICK_IMAGE_REQUEST = 111;
-    Uri filePath;
-    ProgressDialog pd;
     ModuleParcelable userDetails;
     ArrayList<Image> images;
+    Uri documentPath;
+
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -52,7 +50,8 @@ public class UserActivity extends AppCompatActivity {
     StorageReference storageRef = storage.getReferenceFromUrl("gs://smartcloudstorage-017.appspot.com");
     //creating reference to firebase database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference databaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/StoragePhotoUrl/");
+    DatabaseReference photoDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/StoragePhotoUrl/");
+    DatabaseReference fileDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/FileStorage");
 
     String userId;
     FirebaseUser currentUser;
@@ -69,13 +68,11 @@ public class UserActivity extends AppCompatActivity {
         chooseImg = (Button) findViewById(R.id.chooseImg);
         uploadImg = (Button) findViewById(R.id.uploadImg);
         downloadImg = (Button) findViewById(R.id.downloadImg);
-        chooseDocu = (Button) findViewById(R.id.chooseDocument);
-        uploadDocu = (Button) findViewById(R.id.uploadDocument);
+        chooseFile = (Button) findViewById(R.id.chooseFile);
+        uploadFile = (Button) findViewById(R.id.uploadFile);
+        downloadFile = (Button) findViewById(R.id.downloadFile);
         imgView = (ImageView) findViewById(R.id.imgView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floating_chat);
-
-        pd = new ProgressDialog(this);
-        pd.setMessage("Uploading....");
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
@@ -149,11 +146,13 @@ public class UserActivity extends AppCompatActivity {
                                 String photoUrl = downloadUrl.toString();
                                 String email = userDetails.getEmail();
                                 String title = temp;
+                                @SuppressWarnings("VisibleForTests") String type = taskSnapshot.getMetadata().getContentType();
+                                Log.i("userActivity","type :::::: "+ type);
 
                                 if (photoUrl.length()>0){
-                                ModuleParcelable moduleParcelable = new ModuleParcelable(title,email,photoUrl);
-                                    userId = databaseReference.push().getKey();
-                                    databaseReference.child(userId).setValue(moduleParcelable);
+                                ObjectModule objectModule = new ObjectModule(title,email,photoUrl, type);
+                                    userId = photoDatabaseReference.push().getKey();
+                                    photoDatabaseReference.child(userId).setValue(objectModule);
                                 }
                                 Toast.makeText(UserActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                             }
@@ -167,21 +166,57 @@ public class UserActivity extends AppCompatActivity {
             } }
         });
 
-        chooseDocu.setOnClickListener(new View.OnClickListener() {
+        chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //creating an intent for file chooser
                 Intent intent = new Intent();
-                intent.setType("application/pdf");
+                intent.setType("application/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_PDF_CODE);
+                startActivityForResult(Intent.createChooser(intent, "Select File"), PICK_PDF_CODE);
             }
         });
 
-        uploadDocu.setOnClickListener(new View.OnClickListener() {
+        uploadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("UserActivity", "uri : "+ documentPath);
+                final String docuTitle = new File((documentPath).getPath()).getName();
+                StorageReference ref = storageRef.child("Documents/" + docuTitle);
 
+                Log.i("UserActivity", "name : " + docuTitle);
+                ref.putFile(documentPath)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                @SuppressWarnings("VisibleForTests") Uri documentUrl = taskSnapshot.getDownloadUrl();
+                                String fileUrl = documentUrl.toString();
+                                String email = userDetails.getEmail();
+                                String title = docuTitle;
+                                @SuppressWarnings("VisibleForTests") String type = (taskSnapshot.getMetadata().getContentType());
+                                Log.i("userActivity","type :::::: "+ type);
+
+                                if (fileUrl.length()>0){
+                                    ObjectModule objectModule = new ObjectModule(title,email,fileUrl, type);
+                                    userId = fileDatabaseReference.push().getKey();
+                                    fileDatabaseReference.child(userId).setValue(objectModule);
+                                }
+                                Toast.makeText(UserActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(UserActivity.this, "Upload Failed -> " + e, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
+        downloadFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserActivity.this,DownloadFileActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -196,7 +231,7 @@ public class UserActivity extends AppCompatActivity {
             //if a file is selected
             if (data.getData() != null) {
                 //uploading the file
-                Log.i("UserActivity","pdf data : "+ data.getData());
+                documentPath = data.getData();
             }else{
                 Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
             }

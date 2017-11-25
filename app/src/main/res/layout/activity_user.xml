@@ -20,8 +20,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose Document"
-        android:id="@+id/chooseDocument"/>
+        android:text="Choose File"
+        android:id="@+id/chooseFile"/>
 
     <Button
         android:layout_width="match_parent"
@@ -33,14 +33,20 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Upload Document"
-        android:id="@+id/uploadDocument"/>
+        android:text="Upload File"
+        android:id="@+id/uploadFile"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Download Image"
         android:id="@+id/downloadImg"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Download File"
+        android:id="@+id/downloadFile"/>
 
     <ImageView
         android:layout_width="match_parent"
