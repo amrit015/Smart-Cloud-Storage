@@ -2,6 +2,7 @@ package com.amrit.smartcloudstorage;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -169,11 +170,36 @@ public class UserActivity extends AppCompatActivity {
         chooseFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //creating an intent for file chooser
-                Intent intent = new Intent();
-                intent.setType("application/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select File"), PICK_PDF_CODE);
+//                //creating an intent for file chooser
+//                Intent intent = new Intent();
+//                intent.setType("image/*|application/pdf|audio/*|video/*|application/*");
+//                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+//                startActivityForResult(Intent.createChooser(intent, "Select File"), PICK_PDF_CODE);
+                String[] mimeTypes =
+                        {"application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .doc & .docx
+                                "application/vnd.ms-powerpoint","application/vnd.openxmlformats-officedocument.presentationml.presentation", // .ppt & .pptx
+                                "application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xls & .xlsx
+                                "text/plain",
+                                "image/*", "audio/*", "video/*",
+                                "application/pdf",
+                                "application/zip"};
+
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
+                    if (mimeTypes.length > 0) {
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    }
+                } else {
+                    String mimeTypesStr = "";
+                    for (String mimeType : mimeTypes) {
+                        mimeTypesStr += mimeType + "|";
+                    }
+                    intent.setType(mimeTypesStr.substring(0,mimeTypesStr.length() - 1));
+                }
+                startActivityForResult(Intent.createChooser(intent,"ChooseFile"), 0);
             }
         });
 
@@ -227,7 +253,7 @@ public class UserActivity extends AppCompatActivity {
             //The array list has the image paths of the selected images
             images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
         }
-        if (requestCode == PICK_PDF_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == 0 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             //if a file is selected
             if (data.getData() != null) {
                 //uploading the file
