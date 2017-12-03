@@ -4,11 +4,9 @@ import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -38,12 +36,12 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
     private static String LOG_TAG = "MyRecyclerViewAdapter";
     Context context;
     ObjectModule objectModule;
+    String fileType;
+    String type;
     private ArrayList<ObjectModule> mDataset;
     private String name;
     private int position;
     private String image;
-    String fileType;
-    String type;
 
     public MyRecyclerViewAdapter(DownloadImagesActivity activity, ArrayList<ObjectModule> mDataset) {
         context = activity;
@@ -53,6 +51,21 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
     public MyRecyclerViewAdapter(DownloadFileActivity downloadFileActivity, ArrayList<ObjectModule> moduleList) {
         context = downloadFileActivity;
         this.mDataset = moduleList;
+    }
+
+    public static boolean containsAny(String str, String[] words) {
+        boolean bResult = false; // will be set, if any of the words are found
+        //String[] words = {"word1", "word2", "word3", "word4", "word5"};
+
+        List<String> list = Arrays.asList(words);
+        for (String word : list) {
+            boolean bFound = str.contains(word);
+            if (bFound) {
+                bResult = bFound;
+                break;
+            }
+        }
+        return bResult;
     }
 
     @Override
@@ -77,7 +90,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
             String img[];
             img = new String[]{"jpeg", "png", "jpg"};
             Boolean checkType = false;
-            checkType = containsAny(type,img);
+            checkType = containsAny(type, img);
 
             if (checkType) {
                 //using Glide to load images
@@ -133,32 +146,33 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
 
                 type = objectModule.getType();
                 fileType = type.substring(type.lastIndexOf('/') + 1);
+                String img[];
+                img = new String[]{"jpeg", "png", "jpg"};
+                Boolean checkType = false;
+                checkType = containsAny(type, img);
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.parse(objectModule.getUrl()), type);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                Intent newIntent = Intent.createChooser(intent, "Open File");
-                try {
-                    context.startActivity(newIntent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(context, "No app found", Toast.LENGTH_SHORT).show();
+                if (checkType) {
+                    Intent i = new Intent(context, ViewPhotoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("photoUrl", objectModule.getUrl());
+                    bundle.putString("uploader", objectModule.getUploader());
+                    bundle.putString("photoTitle", objectModule.getTitle());
+                    i.putExtras(bundle);
+                    context.startActivity(i);
+                } else {
+                    // for non-image items
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(objectModule.getUrl()), type);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    Intent newIntent = Intent.createChooser(intent, "Open File");
+                    try {
+                        context.startActivity(newIntent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(context, "No app found", Toast.LENGTH_SHORT).show();
+                    }
                 }
-
             }
         });
-    }
-
-    public static boolean containsAny(String str, String[] words)
-    {
-        boolean bResult=false; // will be set, if any of the words are found
-        //String[] words = {"word1", "word2", "word3", "word4", "word5"};
-
-        List<String> list = Arrays.asList(words);
-        for (String word: list ) {
-            boolean bFound = str.contains(word);
-            if (bFound) {bResult=bFound; break;}
-        }
-        return bResult;
     }
 
     @Override
@@ -183,10 +197,10 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
 
         public EventsHolder(View itemView) {
             super(itemView);
-            cardView = (CardView) itemView.findViewById(R.id.card_view);
-            storedImage = (ImageView) itemView.findViewById(R.id.stored_image);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
-            textImage = (TextView) itemView.findViewById(R.id.image_text);
+            cardView = itemView.findViewById(R.id.card_view);
+            storedImage = itemView.findViewById(R.id.stored_image);
+            progressBar = itemView.findViewById(R.id.progressBar);
+            textImage = itemView.findViewById(R.id.image_text);
             Log.i(LOG_TAG, "Adding Listener");
         }
     }

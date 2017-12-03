@@ -36,16 +36,14 @@ import java.util.ArrayList;
 
 public class UserActivity extends AppCompatActivity {
 
+    //this is the pic pdf code used in file chooser
+    final static int PICK_PDF_CODE = 2342;
     Button chooseImg, uploadImg, downloadImg;
     Button chooseFile, uploadFile, downloadFile;
     ImageView imgView;
     ModuleParcelable userDetails;
     ArrayList<Image> images;
     Uri documentPath;
-
-
-    private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseAuth auth;
     //creating reference to firebase storage
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReferenceFromUrl("gs://smartcloudstorage-017.appspot.com");
@@ -53,11 +51,10 @@ public class UserActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference photoDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/StoragePhotoUrl/");
     DatabaseReference fileDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com"+"/FileStorage");
-
     String userId;
     FirebaseUser currentUser;
-    //this is the pic pdf code used in file chooser
-    final static int PICK_PDF_CODE = 2342;
+    private FirebaseAuth.AuthStateListener authListener;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +69,6 @@ public class UserActivity extends AppCompatActivity {
         chooseFile = (Button) findViewById(R.id.chooseFile);
         uploadFile = (Button) findViewById(R.id.uploadFile);
         downloadFile = (Button) findViewById(R.id.downloadFile);
-        imgView = (ImageView) findViewById(R.id.imgView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floating_chat);
 
         //get firebase auth instance
@@ -99,7 +95,7 @@ public class UserActivity extends AppCompatActivity {
         String userProvider = currentUser.getProviderId();
         Log.i("UserActivity : ", "Current User: " + currentUser);
         Log.i("UserActivity : ", "User Details: " + userName + " " + userEmail + " " + userProvider);
-        userDetails.setEmail(userEmail);
+        ModuleParcelable.setEmail(userEmail);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,7 +141,7 @@ public class UserActivity extends AppCompatActivity {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 String photoUrl = downloadUrl.toString();
-                                String email = userDetails.getEmail();
+                                String email = ModuleParcelable.getEmail();
                                 String title = temp;
                                 @SuppressWarnings("VisibleForTests") String type = taskSnapshot.getMetadata().getContentType();
                                 Log.i("userActivity","type :::::: "+ type);
@@ -216,7 +212,7 @@ public class UserActivity extends AppCompatActivity {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 @SuppressWarnings("VisibleForTests") Uri documentUrl = taskSnapshot.getDownloadUrl();
                                 String fileUrl = documentUrl.toString();
-                                String email = userDetails.getEmail();
+                                String email = ModuleParcelable.getEmail();
                                 String title = docuTitle;
                                 @SuppressWarnings("VisibleForTests") String type = (taskSnapshot.getMetadata().getContentType());
                                 Log.i("userActivity","type :::::: "+ type);
