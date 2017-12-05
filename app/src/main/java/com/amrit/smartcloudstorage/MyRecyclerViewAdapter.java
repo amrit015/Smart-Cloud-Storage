@@ -39,9 +39,10 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
     String fileType;
     String type;
     private ArrayList<ObjectModule> mDataset;
-    private String name;
+    private String userGroup;
     private int position;
     private String image;
+    public static final String SHARED_PREF_NAME = "cloudLogIn";
 
     public MyRecyclerViewAdapter(DownloadImagesActivity activity, ArrayList<ObjectModule> mDataset) {
         context = activity;
@@ -51,6 +52,11 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
     public MyRecyclerViewAdapter(DownloadFileActivity downloadFileActivity, ArrayList<ObjectModule> moduleList) {
         context = downloadFileActivity;
         this.mDataset = moduleList;
+    }
+
+    public MyRecyclerViewAdapter(UserHomeActivity userHomeActivity, ArrayList<ObjectModule> fileList) {
+        context = userHomeActivity;
+        this.mDataset = fileList;
     }
 
     public static boolean containsAny(String str, String[] words) {
@@ -82,45 +88,56 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
         // binding the views to display the name, description and user in the recyclerview
         objectModule = mDataset.get(position);
         if (!objectModule.getUrl().equals("")) {
-            Log.i("RecyclerViewAdapter", "url: " + objectModule.getUrl());
-            type = objectModule.getType();
-            fileType = type.substring(type.lastIndexOf('/') + 1);
-            Log.i("RecyclerView", "type:" + type);
-            holder.progressBar.setVisibility(View.VISIBLE);
-            String img[];
-            img = new String[]{"jpeg", "png", "jpg"};
-            Boolean checkType = false;
-            checkType = containsAny(type, img);
+            //getting the group on which the user is currently logged in
+            // fetching value from sharedpreference
+//            SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            if (checkType) {
-                //using Glide to load images
-                Glide.clear(holder.storedImage);
-                Glide.with(context)
-                        .load(objectModule.getUrl())
-                        .fitCenter()
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                holder.progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
+            // Fetching the boolean value form sharedpreferences
+//            userGroup = sharedPreferences.getString("user_group", "");
 
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                holder.progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(holder.storedImage);
-            } else {
-                holder.progressBar.setVisibility(View.GONE);
-                holder.storedImage.setImageResource(R.drawable.file);
+//            if (userGroup.equals(objectModule.getUserGroup())) {
+                Log.i("RecyclerViewAdapter", "url: " + objectModule.getUrl());
+                type = objectModule.getType();
+                fileType = type.substring(type.lastIndexOf('/') + 1);
+                Log.i("RecyclerView", "type:" + type);
+                holder.progressBar.setVisibility(View.VISIBLE);
+                String img[];
+                img = new String[]{"jpeg", "png", "jpg"};
+                Boolean checkType = false;
+                checkType = containsAny(type, img);
+
+                if (checkType) {
+                    //using Glide to load images
+                    Glide.clear(holder.storedImage);
+                    Glide.with(context)
+                            .load(objectModule.getUrl())
+                            .fitCenter()
+                            .listener(new RequestListener<String, GlideDrawable>() {
+                                @Override
+                                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                    holder.progressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                    holder.progressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .into(holder.storedImage);
+                } else {
+                    holder.progressBar.setVisibility(View.GONE);
+                    holder.storedImage.setImageResource(R.drawable.file);
 //                holder.storedImage.setCropToPadding(true);
-                holder.textImage.setText(objectModule.getTitle());
-                holder.textImage.setVisibility(View.VISIBLE);
-            }
-
+                    holder.textImage.setText(objectModule.getTitle());
+                    holder.textImage.setVisibility(View.VISIBLE);
+                }
+//            } else {
+//                holder.cardView.setVisibility(View.GONE);
+//            }
         } else {
             holder.cardView.setVisibility(View.GONE);
         }

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 public class DownloadFileActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.LayoutManager mLayoutManager;
     GridLayoutManager mGridLayoutManager;
     //database reference
     FirebaseDatabase database = FirebaseDatabase.getInstance();

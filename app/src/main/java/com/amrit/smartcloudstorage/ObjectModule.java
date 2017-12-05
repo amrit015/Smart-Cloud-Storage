@@ -9,16 +9,18 @@ public class ObjectModule {
     public String uploader;
     public String url;
     public String type;
+    public String userGroup;
 
     public ObjectModule(){
 
     }
 
-    public ObjectModule(String title, String uploader, String url, String type){
+    public ObjectModule(String title, String uploader, String url, String type, String userGroup){
         this.title = title;
         this.uploader = uploader;
         this.url = url;
         this.type = type;
+        this.userGroup = userGroup;
     }
 
     public String getUrl() {
@@ -51,5 +53,13 @@ public class ObjectModule {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getUserGroup() {
+        return userGroup;
+    }
+
+    public void setUserGroup(String userGroup) {
+        this.userGroup = userGroup;
     }
 }

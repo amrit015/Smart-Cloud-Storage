@@ -31,6 +31,8 @@
         <activity android:name=".DownloadImagesActivity"></activity>
         <activity android:name=".DownloadFileActivity"></activity>
         <activity android:name=".ViewPhotoActivity"></activity>
+        <activity android:name=".UserHomeActivity"></activity>
+        <activity android:name=".GroupActivity"></activity>
 
         <activity
             android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"

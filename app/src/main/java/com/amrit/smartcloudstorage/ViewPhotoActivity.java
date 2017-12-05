@@ -49,7 +49,7 @@ import java.util.List;
 public class ViewPhotoActivity extends AppCompatActivity {
     CardView cardView;
     TextView tTitle, tUploader, tResults;
-    ProgressBar progressBar;
+    ProgressBar progressBar, progressBarResults;
     String sTitle, sUploader, sResults, sUrl;
     ImageView imageView;
     String VISION_API_KEY;
@@ -67,10 +67,11 @@ public class ViewPhotoActivity extends AppCompatActivity {
         tUploader = (TextView) findViewById(R.id.photo_uploader);
         imageView = (ImageView) findViewById(R.id.photo);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBarResults = (ProgressBar) findViewById(R.id.progress_results);
         VISION_API_KEY = getResources().getString(R.string.vision_api);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.photo_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(false);
         mLayoutManager = new LinearLayoutManager(ViewPhotoActivity.this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -101,8 +102,8 @@ public class ViewPhotoActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imageView);
 
-        tTitle.setText(sTitle);
-        tUploader.setText(sUploader);
+        tTitle.setText("Title : " + sTitle);
+        tUploader.setText("Uploader : " + sUploader);
         new CallCloudVisionForResults().execute();
     }
 
@@ -119,29 +120,6 @@ public class ViewPhotoActivity extends AppCompatActivity {
             label2 = "";
         }
 
-//        if (labels != null) {
-//            for (EntityAnnotation label : labels) {
-//                message.append(String.format(Locale.getDefault(), "%.3f: %s",
-//                        label.getScore(), label.getDescription()));
-//                message.append("\n");
-//            }
-//        } else {
-//            message.append("nothing\n");
-//        }
-
-//        message.append("Texts:\n");
-//        List<EntityAnnotation> texts = response.getResponses().get(0)
-//                .getTextAnnotations();
-//        if (texts != null) {
-//            for (EntityAnnotation text : texts) {
-//                message.append(String.format(Locale.getDefault(), "%s: %s",
-//                        text.getLocale(), text.getDescription()));
-//                message.append("\n");
-//            }
-//        } else {
-//            message.append("nothing\n");
-//        }
-
         message.append("Landmarks:\n");
         List<EntityAnnotation> landmarks = response.getResponses().get(0)
                 .getLandmarkAnnotations();
@@ -153,16 +131,6 @@ public class ViewPhotoActivity extends AppCompatActivity {
             landmark1 = "";
             landmark2 = "";
         }
-
-//        if (landmarks != null) {
-//            for (EntityAnnotation landmark : landmarks) {
-//                message.append(String.format(Locale.getDefault(), "%.3f: %s",
-//                        landmark.getScore(), landmark.getDescription()));
-//                message.append("\n");
-//            }
-//        } else {
-//            message.append("nothing\n");
-//        }
 
         message.append("Web Entities:\n");
         WebDetection webEntities = response.getResponses().get(0)
@@ -185,23 +153,6 @@ public class ViewPhotoActivity extends AppCompatActivity {
             webPage1 = "";
             webPage2 = "";
         }
-
-//        Log.i(LOG_TAG, " url : " + webLink.get(0).getUrl());
-
-//        if (webResults != null) {
-//            for (WebEntity webEntity : webResults) {
-//                message.append(String.format(Locale.getDefault(), "%.3f: %s",
-//                        webEntity.getScore(), webEntity.getDescription()));
-//
-//                message.append("\n");
-//            }
-//        } else {
-//            message.append("nothing\n");
-//        }
-//        if (webLink != null) {
-//            for (WebPage webPage : webLink) {
-//            }
-//        }
 
         ObjectVisionResults obj = new ObjectVisionResults();
         obj.setPrimaryLabel(label1);
@@ -314,6 +265,7 @@ public class ViewPhotoActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Results from Vision API : " + result);
             MyVisionResultsAdapter mAdapter = new MyVisionResultsAdapter(ViewPhotoActivity.this, result);
             mRecyclerView.setAdapter(mAdapter);
+            progressBarResults.setVisibility(View.GONE);
             mAdapter.notifyDataSetChanged();
         }
     }

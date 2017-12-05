@@ -55,6 +55,7 @@ public class UserActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
+    String userGroup="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +148,7 @@ public class UserActivity extends AppCompatActivity {
                                 Log.i("userActivity","type :::::: "+ type);
 
                                 if (photoUrl.length()>0){
-                                ObjectModule objectModule = new ObjectModule(title,email,photoUrl, type);
+                                ObjectModule objectModule = new ObjectModule(title,email,photoUrl, type, userGroup);
                                     userId = photoDatabaseReference.push().getKey();
                                     photoDatabaseReference.child(userId).setValue(objectModule);
                                 }
@@ -218,7 +219,7 @@ public class UserActivity extends AppCompatActivity {
                                 Log.i("userActivity","type :::::: "+ type);
 
                                 if (fileUrl.length()>0){
-                                    ObjectModule objectModule = new ObjectModule(title,email,fileUrl, type);
+                                    ObjectModule objectModule = new ObjectModule(title,email,fileUrl, type, userGroup);
                                     userId = fileDatabaseReference.push().getKey();
                                     fileDatabaseReference.child(userId).setValue(objectModule);
                                 }

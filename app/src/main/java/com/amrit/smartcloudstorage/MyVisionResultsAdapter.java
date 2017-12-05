@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -41,16 +41,80 @@ public class MyVisionResultsAdapter extends RecyclerView.Adapter<MyVisionResults
         // binding the views to display the name, description and user in the recyclerview
         objectVisionResults = mDataset.get(position);
         if (objectVisionResults != null) {
-            holder.progressBar.setVisibility(View.GONE);
-            holder.label1.setText(objectVisionResults.getPrimaryLabel());
-            holder.label2.setText(objectVisionResults.getSecondaryLabel());
-            holder.landmark1.setText(objectVisionResults.getPrimaryLandmark());
-            holder.landmark2.setText(objectVisionResults.getSecondaryLandmark());
-            holder.webDescription1.setText(objectVisionResults.getPrimaryWeb());
-            holder.webDescription2.setText(objectVisionResults.getSecondaryWeb());
-            holder.webPage1.setText(objectVisionResults.getPrimaryPage());
-            holder.webPage2.setText(objectVisionResults.getSecondaryPage());
-        } else {
+            if (!objectVisionResults.getPrimaryLabel().equals("")) {
+                holder.label1.setText(objectVisionResults.getPrimaryLabel());
+            } else {
+                holder.label1.setVisibility(View.GONE);
+            }
+
+            if (!objectVisionResults.getSecondaryLabel().equals("")) {
+                holder.label2.setText(objectVisionResults.getSecondaryLabel());
+
+            } else {
+                holder.label2.setVisibility(View.GONE);
+
+            }
+
+            if (!objectVisionResults.getPrimaryLandmark().equals("")) {
+                holder.landmark1.setText(objectVisionResults.getPrimaryLandmark());
+
+            } else {
+                holder.landmark1.setVisibility(View.GONE);
+
+            }
+
+            if (!objectVisionResults.getSecondaryLandmark().equals("")) {
+                holder.landmark2.setText(objectVisionResults.getSecondaryLandmark());
+
+            } else {
+                holder.landmark2.setVisibility(View.GONE);
+
+            }
+
+            if (!objectVisionResults.getPrimaryWeb().equals("")) {
+                holder.webDescription1.setText(objectVisionResults.getPrimaryWeb());
+
+            } else {
+                holder.webDescription1.setVisibility(View.GONE);
+
+            }
+
+            if (!objectVisionResults.getSecondaryWeb().equals("")) {
+                holder.webDescription2.setText(objectVisionResults.getSecondaryWeb());
+
+            } else {
+                holder.webDescription2.setVisibility(View.GONE);
+
+            }
+
+            if (!objectVisionResults.getPrimaryPage().equals("")) {
+                holder.webPage1.setText(objectVisionResults.getPrimaryPage());
+
+            } else {
+                holder.webPage1.setVisibility(View.GONE);
+            }
+
+            if (!objectVisionResults.getSecondaryPage().equals("")) {
+                holder.webPage2.setText(objectVisionResults.getSecondaryPage());
+            } else {
+                holder.webPage2.setVisibility(View.GONE);
+            }
+
+            if (objectVisionResults.getPrimaryLabel().equals("") && objectVisionResults.getSecondaryLabel().equals("")) {
+                holder.labelLayout.setVisibility(View.GONE);
+            }
+
+            if (objectVisionResults.getPrimaryLandmark().equals("") && objectVisionResults.getSecondaryLandmark().equals("")) {
+                holder.landmarkLayout.setVisibility(View.GONE);
+            }
+
+            if (objectVisionResults.getPrimaryWeb().equals("") && objectVisionResults.getSecondaryWeb().equals("")) {
+                holder.webLayout.setVisibility(View.GONE);
+            }
+
+            if (objectVisionResults.getPrimaryPage().equals("") && objectVisionResults.getSecondaryPage().equals("")) {
+                holder.webpageLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -73,7 +137,7 @@ public class MyVisionResultsAdapter extends RecyclerView.Adapter<MyVisionResults
                 landmark1, landmark2,
                 webDescription1, webDescription2,
                 webPage2, webPage1;
-        ProgressBar progressBar;
+        LinearLayout labelLayout, landmarkLayout, webLayout, webpageLayout;
 
         public ResultsHolder(View itemView) {
             super(itemView);
@@ -85,7 +149,10 @@ public class MyVisionResultsAdapter extends RecyclerView.Adapter<MyVisionResults
             webDescription2 = itemView.findViewById(R.id.web_results2);
             webPage1 = itemView.findViewById(R.id.web_page1);
             webPage2 = itemView.findViewById(R.id.web_page2);
-            progressBar = itemView.findViewById(R.id.progress_vision);
+            labelLayout = itemView.findViewById(R.id.layout_label);
+            landmarkLayout = itemView.findViewById(R.id.layout_landmark);
+            webLayout = itemView.findViewById(R.id.layout_web);
+            webpageLayout = itemView.findViewById(R.id.layout_webpage);
             Log.i(LOG_TAG, "Adding Listener");
         }
     }
