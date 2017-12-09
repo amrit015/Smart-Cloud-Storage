@@ -1,5 +1,7 @@
 package com.amrit.smartcloudstorage;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,6 +35,8 @@ public class ChatServiceActivity extends AppCompatActivity {
     EditText messageArea;
     ScrollView scrollView;
     DatabaseReference reference1, reference2;
+    public static final String SHARED_PREF_NAME = "cloudLogIn";
+    String userGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,13 @@ public class ChatServiceActivity extends AppCompatActivity {
         scrollView = (ScrollView)findViewById(R.id.scrollView);
         final String email = getIntent().getStringExtra("user");
         Log.i("ChatServiceActivity", "email : "+ email);
+        //getting the group on which the user is currently logged in
+        // fetching value from sharedpreference
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Fetching the boolean value form sharedpreferences
+        userGroup = sharedPreferences.getString("user_group", "");
 
         reference1 = FirebaseDatabase.getInstance()
                 .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + "GroupChat");
@@ -62,6 +73,7 @@ public class ChatServiceActivity extends AppCompatActivity {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("message", messageText);
                     map.put("user", ModuleParcelable.getEmail());
+                    map.put("group", userGroup);
                     reference1.push().setValue(map);
 //                    reference2.push().setValue(map);
                     messageArea.setText("");
@@ -75,12 +87,14 @@ public class ChatServiceActivity extends AppCompatActivity {
                 Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                 String message = map.get("message").toString();
                 String userName = map.get("user").toString();
+                String group = map.get("group").toString();
+                if (group.equals(userGroup)) {
 
-                if(userName.equals(ModuleParcelable.getEmail())){
-                    addMessageBox("You:-\n" + message, 1);
-                }
-                else{
-                    addMessageBox(ModuleParcelable.chatWith + userName + "\n" + message, 2);
+                    if (userName.equals(ModuleParcelable.getEmail())) {
+                        addMessageBox("You:-\n" + message, 1);
+                    } else {
+                        addMessageBox(ModuleParcelable.chatWith + userName + "\n" + message, 2);
+                    }
                 }
             }
 

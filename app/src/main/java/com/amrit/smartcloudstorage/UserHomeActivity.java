@@ -236,6 +236,7 @@ public class UserHomeActivity extends AppCompatActivity {
     }
 
     private void uploadImages() {
+        Toast.makeText(UserHomeActivity.this, "Uploading....", Toast.LENGTH_SHORT).show();
         if (images != null) {
             final Uri[] uri = new Uri[images.size()];
             for (int i = 0; i < images.size(); i++) {
@@ -248,6 +249,7 @@ public class UserHomeActivity extends AppCompatActivity {
                 ref.putFile(uri[i])
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
                                 @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                 String photoUrl = downloadUrl.toString();
                                 String email = ModuleParcelable.getEmail();
@@ -280,6 +282,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
     private void uploadFile() {
         if (documentPath != null) {
+            Toast.makeText(UserHomeActivity.this, "Uploading....", Toast.LENGTH_SHORT).show();
             Log.i("UserHomeActivity", "uri : " + documentPath);
             final String docuTitle = new File((documentPath).getPath()).getName();
             StorageReference ref = storageRef.child("Documents/" + docuTitle);

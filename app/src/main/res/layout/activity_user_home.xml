@@ -10,8 +10,8 @@
     <RelativeLayout
         android:id="@+id/layout_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="match_parent"
+        android:paddingBottom="50dp">
 
         <ProgressBar
             android:id="@+id/progress_recycler"
@@ -19,17 +19,13 @@
             android:layout_height="match_parent" />
 
         <android.support.v7.widget.RecyclerView
-            android:background="@color/input_register"
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/input_register"
             android:scrollbars="vertical" />
-    </RelativeLayout>
 
-    <Space
-        android:layout_below="@+id/layout_image"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"/>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/floating_bars"
@@ -44,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
             android:src="@drawable/message"
             app:backgroundTint="@color/bg_gray" />
 
@@ -53,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
+            android:layout_marginTop="20dp"
             android:src="@drawable/upload_image"
             app:backgroundTint="@color/bg_gray" />
 
@@ -62,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/floating_chat"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:src="@drawable/upload_file"
             app:backgroundTint="@color/bg_gray" />
 
