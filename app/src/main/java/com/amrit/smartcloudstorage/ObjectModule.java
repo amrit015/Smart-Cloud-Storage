@@ -2,6 +2,7 @@ package com.amrit.smartcloudstorage;
 
 /**
  * Created by Amrit on 11/22/2017.
+ * Object for files in the database
  */
 
 public class ObjectModule {

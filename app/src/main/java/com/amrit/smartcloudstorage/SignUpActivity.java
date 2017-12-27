@@ -18,6 +18,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Created by Amrit on 11/7/2017.
+ * Sign Up Page
+ * Users are created using the Firebase Authorization API
  */
 
 public class SignUpActivity extends AppCompatActivity {
@@ -28,14 +30,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        btnSignIn = (Button) findViewById(R.id.sign_button);
-        btnSignUp = (Button) findViewById(R.id.register_button);
-        inputEmail = (EditText) findViewById(R.id.register_email);
-        inputPassword = (EditText) findViewById(R.id.register_password);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        btnSignIn = findViewById(R.id.sign_button);
+        btnSignUp = findViewById(R.id.register_button);
+        inputEmail = findViewById(R.id.register_email);
+        inputPassword = findViewById(R.id.register_password);
+        progressBar = findViewById(R.id.progressBar);
+
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
         btnSignUp.setOnClickListener(new View.OnClickListener() {
@@ -60,16 +62,16 @@ public class SignUpActivity extends AppCompatActivity {
                 }
 
                 progressBar.setVisibility(View.VISIBLE);
-                //create user
+                //creating user
                 auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                                 progressBar.setVisibility(View.GONE);
-                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // If sign in fails, a message is displayed to the user. If sign in succeeds,
                                 // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
+                                // signed in user is handled in the listener.
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
@@ -79,7 +81,6 @@ public class SignUpActivity extends AppCompatActivity {
                                 }
                             }
                         });
-
             }
         });
 

@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 /**
  * Created by Amrit on 11/11/2017.
+ * Parcelable Object
  */
 
 public class ModuleParcelable implements Parcelable {
@@ -46,9 +47,9 @@ public class ModuleParcelable implements Parcelable {
         /* reading back each field from the parcel in the same order it was written
            to the parcel
         */
-        this.username = in.readString();
-        this.email = in.readString();
-        this.password = in.readString();
+        username = in.readString();
+        email = in.readString();
+        password = in.readString();
         this.photoTitle = in.readString();
         this.photoUploader = in.readString();
         this.photoUrl = in.readString();

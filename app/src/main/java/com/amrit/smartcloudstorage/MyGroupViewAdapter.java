@@ -19,26 +19,18 @@ import java.util.ArrayList;
 
 /**
  * Created by Amrit on 12/4/2017.
+ * RecyclerView Adapter for displaying the group and handling the user-click on the group
  */
 
 public class MyGroupViewAdapter extends RecyclerView.Adapter<MyGroupViewAdapter.GroupHolder> {
-    private static String LOG_TAG = "MyRecyclerViewAdapter";
+    private static String LOG_TAG = "MyFilesViewAdapter";
     Context context;
     CreateGroupModule createGroupModule;
-    GroupUsersModule groupUsersModule;
     private ArrayList<CreateGroupModule> mDataset;
-//    ArrayList<GroupUsersModule> gDataset;
     private String rGroupName;
     private int position;
     private String rGroupPass;
     public static final String SHARED_PREF_NAME = "cloudLogIn";
-
-//    public MyGroupViewAdapter(GroupActivity groupActivity, ArrayList<CreateGroupModule> groupList, ArrayList<GroupUsersModule> groupUsersList) {
-//        context = groupActivity;
-//        this.mDataset = groupList;
-//        this.gDataset = groupUsersList;
-//    }
-
 
     public MyGroupViewAdapter(GroupActivity groupActivity, ArrayList<CreateGroupModule> groupList) {
         context = groupActivity;
@@ -56,27 +48,22 @@ public class MyGroupViewAdapter extends RecyclerView.Adapter<MyGroupViewAdapter.
 
     @Override
     public void onBindViewHolder(final MyGroupViewAdapter.GroupHolder holder, final int position) {
-        // binding the views to display the name, description and user in the recyclerview
+        // binding the views to display the group name in the recyclerview
         createGroupModule = mDataset.get(position);
-//        if (gDataset.size() != 0) {
-//            groupUsersModule = gDataset.get(position);
-//        }
         if (!createGroupModule.getGroupName().equals("")) {
             rGroupName = createGroupModule.getGroupName();
             rGroupPass = createGroupModule.getGroupPass();
             holder.groupTitle.setText(rGroupName);
         }
+
+        // handling on-click on the group view
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 String checkEmail = "";
                 String checkGroup = "";
-//                if (gDataset.size() != 0) {
-//                    groupUsersModule = gDataset.get(position);
-//                    checkEmail = groupUsersModule.getUser();
-//                    checkGroup = groupUsersModule.getGroup();
-//                }
+
                 //getting the group on which the user is currently logged in
                 // fetching value from sharedpreference
                 SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -88,7 +75,7 @@ public class MyGroupViewAdapter extends RecyclerView.Adapter<MyGroupViewAdapter.
                     Intent intent = new Intent(context, UserHomeActivity.class);
                     context.startActivity(intent);
                 } else {
-                    // in case the user hasn't logged in the grup before
+                    // in case the user hasn't logged in the group before
                     createGroupModule = mDataset.get(position);
                     LayoutInflater inflater = LayoutInflater.from(context);
                     final View view = inflater.inflate(R.layout.alert_create_group, null);
@@ -120,7 +107,6 @@ public class MyGroupViewAdapter extends RecyclerView.Adapter<MyGroupViewAdapter.
                         }
                     });
 
-
                     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -141,15 +127,7 @@ public class MyGroupViewAdapter extends RecyclerView.Adapter<MyGroupViewAdapter.
         return mDataset.size();
     }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-
+    // for binding the individual group with the cardview
     public class GroupHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView groupTitle;

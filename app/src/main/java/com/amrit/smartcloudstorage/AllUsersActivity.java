@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 /**
  * Created by Amrit on 11/11/2017.
+ * For fetching users
  */
 
 public class AllUsersActivity extends AppCompatActivity {
@@ -40,8 +41,8 @@ public class AllUsersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_users);
 
-        usersList = (ListView) findViewById(R.id.usersList);
-        noUsersText = (TextView) findViewById(R.id.noUsersText);
+        usersList = findViewById(R.id.usersList);
+        noUsersText = findViewById(R.id.noUsersText);
 
         pd = new ProgressDialog(AllUsersActivity.this);
         pd.setMessage("Loading...");

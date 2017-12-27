@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Created by Amrit on 11/6/2017.
+ * To send an email to reset the users password
  */
 
 public class ResetPasswordActivity extends AppCompatActivity {
@@ -30,10 +31,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        inputEmail = (EditText) findViewById(R.id.sing_in_email);
-        btnReset = (Button) findViewById(R.id.reset_password_button);
-        btnBack = (Button) findViewById(R.id.btn_back);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        inputEmail = findViewById(R.id.sing_in_email);
+        btnReset = findViewById(R.id.reset_password_button);
+        btnBack = findViewById(R.id.btn_back);
+        progressBar = findViewById(R.id.progressBar);
 
         auth = FirebaseAuth.getInstance();
 

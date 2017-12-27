@@ -30,31 +30,18 @@ import java.util.List;
 
 /**
  * Created by Amrit on 11/22/2017.
+ * RecyclerView adapter for displaying the files stored on the Firebase Storage
  */
 
-class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.EventsHolder> {
-    private static String LOG_TAG = "MyRecyclerViewAdapter";
+class MyFilesViewAdapter extends RecyclerView.Adapter<MyFilesViewAdapter.EventsHolder> {
+    private static String LOG_TAG = "MyFilesViewAdapter";
     Context context;
     ObjectModule objectModule;
     String fileType;
     String type;
     private ArrayList<ObjectModule> mDataset;
-    private String userGroup;
-    private int position;
-    private String image;
-    public static final String SHARED_PREF_NAME = "cloudLogIn";
 
-    public MyRecyclerViewAdapter(DownloadImagesActivity activity, ArrayList<ObjectModule> mDataset) {
-        context = activity;
-        this.mDataset = mDataset;
-    }
-
-    public MyRecyclerViewAdapter(DownloadFileActivity downloadFileActivity, ArrayList<ObjectModule> moduleList) {
-        context = downloadFileActivity;
-        this.mDataset = moduleList;
-    }
-
-    public MyRecyclerViewAdapter(UserHomeActivity userHomeActivity, ArrayList<ObjectModule> fileList) {
+    public MyFilesViewAdapter(UserHomeActivity userHomeActivity, ArrayList<ObjectModule> fileList) {
         context = userHomeActivity;
         this.mDataset = fileList;
     }
@@ -76,6 +63,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
 
     @Override
     public EventsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // creating the views
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.adapter_myrecycler_view, parent, false);
         context = parent.getContext();
@@ -89,22 +77,16 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
         objectModule = mDataset.get(position);
         if (!objectModule.getUrl().equals("")) {
             //getting the group on which the user is currently logged in
-            // fetching value from sharedpreference
-//            SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            // Fetching the boolean value form sharedpreferences
-//            userGroup = sharedPreferences.getString("user_group", "");
-
-//            if (userGroup.equals(objectModule.getUserGroup())) {
                 Log.i("RecyclerViewAdapter", "url: " + objectModule.getUrl());
                 type = objectModule.getType();
                 fileType = type.substring(type.lastIndexOf('/') + 1);
                 Log.i("RecyclerView", "type:" + type);
                 holder.progressBar.setVisibility(View.VISIBLE);
                 String img[];
+            // defining image types to perform different actions on the images
                 img = new String[]{"jpeg", "png", "jpg"};
                 Boolean checkType = false;
+            // checking if the file is an image
                 checkType = containsAny(type, img);
 
                 if (checkType) {
@@ -129,37 +111,22 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into(holder.storedImage);
                 } else {
+                    // files
                     holder.progressBar.setVisibility(View.GONE);
                     holder.storedImage.setImageResource(R.drawable.file);
-//                holder.storedImage.setCropToPadding(true);
                     holder.textImage.setText(objectModule.getTitle());
                     holder.textImage.setVisibility(View.VISIBLE);
                 }
-//            } else {
-//                holder.cardView.setVisibility(View.GONE);
-//            }
         } else {
             holder.cardView.setVisibility(View.GONE);
         }
+
+        // on-click on the files
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 objectModule = mDataset.get(position);
-//                setPosition(position);
-//                Intent intent = new Intent(Intent.ACTION_VIEW,
-//                           Uri.parse(objectModule.getUrl()));
-//                Log.i("RecylcerVIew ", "url : " + objectModule.getUrl());
-//                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                intent.setType("application/*");
-//                PackageManager pm = context.getPackageManager();
-//                List<ResolveInfo> activities = pm.queryIntentActivities(intent, 0);
-//                if (activities.size() > 0) {
-//                    context.startActivity(intent);
-//                } else {
-//                    // Do something else here. Maybe pop up a Dialog or Toast
-//                    Toast.makeText(context, "No app found", Toast.LENGTH_SHORT).show();
-//                }
 
                 type = objectModule.getType();
                 fileType = type.substring(type.lastIndexOf('/') + 1);
@@ -169,6 +136,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
                 checkType = containsAny(type, img);
 
                 if (checkType) {
+                    // for images
                     Intent i = new Intent(context, ViewPhotoActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("photoUrl", objectModule.getUrl());
@@ -177,7 +145,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
                     i.putExtras(bundle);
                     context.startActivity(i);
                 } else {
-                    // for non-image items
+                    // for non-image files
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.parse(objectModule.getUrl()), type);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -197,15 +165,8 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.E
         return mDataset.size();
     }
 
-    public int getPosition() {
-        return position;
-    }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-
+    // displaying the contents on the cardview, images/files and filename
     public class EventsHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageView storedImage;

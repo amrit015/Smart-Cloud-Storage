@@ -18,18 +18,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+// homepage of the app, users are prompted to sign in or else register a new account
+// sign in using Google Firebase Authentication
 public class SignInActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
     private Button btnSignIn, btnSignUp, btnResetPassword;
     private ProgressBar progressBar;
     FirebaseAuth auth;
-    //boolean variable to check user is logged in or not
-    //initially it is false
-    private boolean loggedIn = false;
 
-    //Keys for Sharedpreferences
-    //This would be the name of our shared preferences
+    //Keys for Shared Preferences
     public static final String SHARED_PREF_NAME = "cloudLogIn";
 
     //This would be used to store the email of current logged in user
@@ -40,7 +38,6 @@ public class SignInActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         //fix for home button restart... only in release version
         if (!isTaskRoot()) {
@@ -58,13 +55,14 @@ public class SignInActivity extends AppCompatActivity {
             finish();
         }
 
-        btnSignIn = (Button) findViewById(R.id.sign_in_button);
-        btnSignUp = (Button) findViewById(R.id.new_user_button);
-        inputEmail = (EditText) findViewById(R.id.sing_in_email);
-        inputPassword = (EditText) findViewById(R.id.sign_in_password);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnResetPassword = (Button) findViewById(R.id.reset_password_button);
+        btnSignIn = findViewById(R.id.sign_in_button);
+        btnSignUp = findViewById(R.id.new_user_button);
+        inputEmail = findViewById(R.id.sing_in_email);
+        inputPassword = findViewById(R.id.sign_in_password);
+        progressBar = findViewById(R.id.progressBar);
+        btnResetPassword = findViewById(R.id.reset_password_button);
 
+        // to reset the password
         btnResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,6 +70,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
+        // to sign in using Firebase Authorization
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,14 +89,14 @@ public class SignInActivity extends AppCompatActivity {
 
                 progressBar.setVisibility(View.VISIBLE);
 
-                //authenticate user
+                //authenticating user
                 auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(SignInActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // If sign in fails, a message is displayed to the user. If sign in succeeds,
                                 // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
+                                // signed in user is handled in the listener.
                                 progressBar.setVisibility(View.GONE);
                                 if (!task.isSuccessful()) {
                                     // there was an error
@@ -120,6 +119,7 @@ public class SignInActivity extends AppCompatActivity {
                                     //Saving values to editor
                                     editor.apply();
 
+                                    // starting the Group Page of the app
                                     Intent intent = new Intent(SignInActivity.this, GroupActivity.class);
                                     startActivity(intent);
                                     finish();
@@ -128,6 +128,8 @@ public class SignInActivity extends AppCompatActivity {
                         });
             }
         });
+
+        // sign up page
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

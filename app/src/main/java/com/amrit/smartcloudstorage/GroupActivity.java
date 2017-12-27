@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Amrit on 12/4/2017.
+ * Group Page. Users can either join a group or create a group.
  */
 
 public class GroupActivity extends AppCompatActivity {
@@ -39,8 +39,8 @@ public class GroupActivity extends AppCompatActivity {
     DatabaseReference groupDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com" + "/GroupUsers");
     // for download
     DatabaseReference groupDbReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com");
+
     TextView tCreateGroup;
-    ListView listview;
     CreateGroupModule createGroupModule;
     String userId;
     FirebaseUser currentUser;
@@ -49,14 +49,12 @@ public class GroupActivity extends AppCompatActivity {
     ArrayList<CreateGroupModule> groupList;
     ArrayList<GroupUsersModule> groupUsersList;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
-        tCreateGroup = (TextView) findViewById(R.id.new_group);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_group);
+        tCreateGroup = findViewById(R.id.new_group);
+        mRecyclerView = findViewById(R.id.recycler_view_group);
         mRecyclerView.setHasFixedSize(false);
         mLayoutManager = new LinearLayoutManager(GroupActivity.this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -67,18 +65,20 @@ public class GroupActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-
                 if (user == null) {
                     // user auth state is changed - user is null
-                    // launch login activity
+                    // launch sign in activity
                     startActivity(new Intent(GroupActivity.this, SignInActivity.class));
                     finish();
                 }
             }
         };
+
         // Creating new user node, which returns the unique key value
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         final String userEmail = currentUser.getEmail();
+
+        // creating group using alert dialog
         tCreateGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,28 +101,28 @@ public class GroupActivity extends AppCompatActivity {
                     }
                 });
 
-
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         alertDialog.dismiss();
                     }
                 });
-
                 alertDialog.setView(view);
                 alertDialog.show();
             }
         });
+        // fetching group users and group
         fetchGroupUsers();
         fetchGroups();
     }
 
     private void fetchGroupUsers() {
-
+        // users within a group can be fetched to check the authentication
+        // can be implemented in future
     }
 
+    // fetching the list of groups, login in the group is handled on MyGroupViewAdapter
     private void fetchGroups() {
-
         final DatabaseReference groupAuth = groupDbReference.child("Group_Authentication");
         groupAuth.addValueEventListener(new ValueEventListener() {
             @Override
@@ -146,8 +146,10 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
+        // database reference for groups
         DatabaseReference group = groupDbReference.child("GroupUsers");
 
+        // adding group
         group.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -161,9 +163,7 @@ public class GroupActivity extends AppCompatActivity {
 
                     Log.i("DownloadFileActivity", "results: " + createGroupModule.getGroupName());
                     groupList.add(createGroupModule);
-//                    Log.i("DownloadImageActivity", "list: " + moduleList);
                 }
-//                MyGroupViewAdapter mAdapter = new MyGroupViewAdapter(GroupActivity.this, groupList ,groupUsersList);
                 MyGroupViewAdapter mAdapter = new MyGroupViewAdapter(GroupActivity.this, groupList);
                 mRecyclerView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();

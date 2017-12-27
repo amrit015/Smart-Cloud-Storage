@@ -2,6 +2,7 @@ package com.amrit.smartcloudstorage;
 
 /**
  * Created by Amrit on 12/4/2017.
+ * Object for users within the group
  */
 
 public class GroupUsersModule {

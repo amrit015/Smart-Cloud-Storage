@@ -2,6 +2,7 @@ package com.amrit.smartcloudstorage;
 
 /**
  * Created by Amrit on 12/2/2017.
+ * Object for storing the results obtained through the Google Vision API
  */
 
 public class ObjectVisionResults {

@@ -23,13 +23,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ResetPasswordActivity"></activity>
-        <activity android:name=".UserFuncActivity"></activity>
         <activity android:name=".SignUpActivity"></activity>
-        <activity android:name=".UserActivity"></activity>
         <activity android:name=".ChatServiceActivity"></activity>
         <activity android:name=".AllUsersActivity"></activity>
-        <activity android:name=".DownloadImagesActivity"></activity>
-        <activity android:name=".DownloadFileActivity"></activity>
         <activity android:name=".ViewPhotoActivity"></activity>
         <activity android:name=".UserHomeActivity"></activity>
         <activity android:name=".GroupActivity"></activity>

@@ -13,14 +13,14 @@ import java.util.ArrayList;
 
 /**
  * Created by Amrit on 12/3/2017.
+ * Displaying the results from Vision API
  */
 
 public class MyVisionResultsAdapter extends RecyclerView.Adapter<MyVisionResultsAdapter.ResultsHolder> {
-    private static String LOG_TAG = "MyRecyclerViewAdapter";
+    private static String LOG_TAG = "MyFilesViewAdapter";
     Context context;
     ObjectVisionResults objectVisionResults;
     private ArrayList<ObjectVisionResults> mDataset;
-    private int position;
 
     public MyVisionResultsAdapter(ViewPhotoActivity viewPhotoActivity, ArrayList<ObjectVisionResults> moduleList) {
         context = viewPhotoActivity;
@@ -122,15 +122,6 @@ public class MyVisionResultsAdapter extends RecyclerView.Adapter<MyVisionResults
     public int getItemCount() {
         return mDataset.size();
     }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
 
     public class ResultsHolder extends RecyclerView.ViewHolder {
         TextView label1, label2,

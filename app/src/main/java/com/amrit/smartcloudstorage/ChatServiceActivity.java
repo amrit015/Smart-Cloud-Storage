@@ -26,6 +26,7 @@ import java.util.Map;
 
 /**
  * Created by Amrit on 11/11/2017.
+ * Chat service within the group
  */
 
 public class ChatServiceActivity extends AppCompatActivity {
@@ -34,7 +35,7 @@ public class ChatServiceActivity extends AppCompatActivity {
     ImageView sendButton;
     EditText messageArea;
     ScrollView scrollView;
-    DatabaseReference reference1, reference2;
+    DatabaseReference reference1;
     public static final String SHARED_PREF_NAME = "cloudLogIn";
     String userGroup;
 
@@ -42,11 +43,11 @@ public class ChatServiceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_service);
-        layout = (LinearLayout) findViewById(R.id.layout1);
-        layout_2 = (RelativeLayout)findViewById(R.id.layout2);
-        sendButton = (ImageView)findViewById(R.id.sendButton);
-        messageArea = (EditText)findViewById(R.id.messageArea);
-        scrollView = (ScrollView)findViewById(R.id.scrollView);
+        layout = findViewById(R.id.layout1);
+        layout_2 = findViewById(R.id.layout2);
+        sendButton = findViewById(R.id.sendButton);
+        messageArea = findViewById(R.id.messageArea);
+        scrollView = findViewById(R.id.scrollView);
         final String email = getIntent().getStringExtra("user");
         Log.i("ChatServiceActivity", "email : "+ email);
         //getting the group on which the user is currently logged in
@@ -60,10 +61,7 @@ public class ChatServiceActivity extends AppCompatActivity {
         reference1 = FirebaseDatabase.getInstance()
                 .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + "GroupChat");
 
-//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + ModuleParcelable.username + "_" + ModuleParcelable.chatWith);
-//        reference2 = FirebaseDatabase.getInstance()
-//                .getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com/" + ModuleParcelable.chatWith + "_" + ModuleParcelable.username);
-
+        // sending messages
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,12 +73,12 @@ public class ChatServiceActivity extends AppCompatActivity {
                     map.put("user", ModuleParcelable.getEmail());
                     map.put("group", userGroup);
                     reference1.push().setValue(map);
-//                    reference2.push().setValue(map);
                     messageArea.setText("");
                 }
             }
         });
 
+        // fetching messages
         reference1.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -129,11 +127,11 @@ public class ChatServiceActivity extends AppCompatActivity {
 
         if(type == 1) {
             lp2.gravity = Gravity.LEFT;
-            textView.setBackgroundResource(R.drawable.common_google_signin_btn_text_light_pressed);
+            textView.setBackgroundResource(R.drawable.common_google_signin_btn_icon_dark_normal);
         }
         else{
             lp2.gravity = Gravity.RIGHT;
-            textView.setBackgroundResource(R.drawable.common_google_signin_btn_text_light_pressed);
+            textView.setBackgroundResource(R.drawable.common_google_signin_btn_icon_dark_normal);
         }
         textView.setLayoutParams(lp2);
         layout.addView(textView);

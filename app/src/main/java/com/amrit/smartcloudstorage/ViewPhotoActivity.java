@@ -44,6 +44,7 @@ import java.util.List;
 
 /**
  * Created by Amrit on 12/2/2017.
+ * Activity to display the images as well as results from Vision API
  */
 
 public class ViewPhotoActivity extends AppCompatActivity {
@@ -62,19 +63,20 @@ public class ViewPhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_photo);
-        cardView = (CardView) findViewById(R.id.cardview_photo);
-        tTitle = (TextView) findViewById(R.id.photo_title);
-        tUploader = (TextView) findViewById(R.id.photo_uploader);
-        imageView = (ImageView) findViewById(R.id.photo);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBarResults = (ProgressBar) findViewById(R.id.progress_results);
+        cardView = findViewById(R.id.cardview_photo);
+        tTitle = findViewById(R.id.photo_title);
+        tUploader = findViewById(R.id.photo_uploader);
+        imageView = findViewById(R.id.photo);
+        progressBar = findViewById(R.id.progressBar);
+        progressBarResults = findViewById(R.id.progress_results);
         VISION_API_KEY = getResources().getString(R.string.vision_api);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.photo_recycler_view);
+        mRecyclerView = findViewById(R.id.photo_recycler_view);
         mRecyclerView.setHasFixedSize(false);
         mLayoutManager = new LinearLayoutManager(ViewPhotoActivity.this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        // getting bundle from the previous activity
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             sTitle = bundle.getString("photoTitle");
@@ -107,7 +109,8 @@ public class ViewPhotoActivity extends AppCompatActivity {
         new CallCloudVisionForResults().execute();
     }
 
-    private ArrayList convertResponseToString(BatchAnnotateImagesResponse response) {
+    // getting results and putting into arraylist
+    private ArrayList convertResponseToArrayList(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder("Results:\n\n");
         message.append("Labels:\n");
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
@@ -177,6 +180,7 @@ public class ViewPhotoActivity extends AppCompatActivity {
         return image;
     }
 
+    // fetching results from Vision API in the background
     private class CallCloudVisionForResults extends AsyncTask<Object, Object, ArrayList> {
 
         @Override
@@ -249,7 +253,7 @@ public class ViewPhotoActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "sending request");
 
                 BatchAnnotateImagesResponse response = annotateRequest.execute();
-                return convertResponseToString(response);
+                return convertResponseToArrayList(response);
 
             } catch (GoogleJsonResponseException e) {
                 Log.e(LOG_TAG, "Request failed: " + e.getContent());

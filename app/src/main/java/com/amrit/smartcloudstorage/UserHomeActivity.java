@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -42,16 +41,14 @@ import java.util.ArrayList;
 
 /**
  * Created by Amrit on 12/4/2017.
+ * User's Home Page inside the group.
+ * The contents images, videos, songs, documents shared within the group are displayed on this activity.
  */
 
 public class UserHomeActivity extends AppCompatActivity {
 
-    //this is the pic pdf code used in file chooser
-    final static int PICK_PDF_CODE = 2342;
     Button chooseImg, uploadImg, downloadImg;
     Button chooseFile, uploadFile, downloadFile;
-    ImageView imgView;
-    ModuleParcelable userDetails;
     ArrayList<Image> images;
     Uri documentPath;
     //creating reference to firebase storage
@@ -66,7 +63,6 @@ public class UserHomeActivity extends AppCompatActivity {
     // for saving users into group
     DatabaseReference groupDataRef = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com" + "/Group_Authentication");
 
-
     private RecyclerView mRecyclerView;
     GridLayoutManager mGridLayoutManager;
     //list to hold all the uploaded images
@@ -80,7 +76,6 @@ public class UserHomeActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     FloatingActionButton chatButton, fileButton, imageButton;
     public static final String SHARED_PREF_NAME = "cloudLogIn";
-    GroupUsersModule groupUsersModule;
     String userEmail;
     int i =0;
 
@@ -91,25 +86,22 @@ public class UserHomeActivity extends AppCompatActivity {
         //firebase offline mode
 //        database.setPersistenceEnabled(true);
 
-        chooseImg = (Button) findViewById(R.id.chooseImg);
-        uploadImg = (Button) findViewById(R.id.uploadImg);
-        downloadImg = (Button) findViewById(R.id.downloadImg);
-        chooseFile = (Button) findViewById(R.id.chooseFile);
-        uploadFile = (Button) findViewById(R.id.uploadFile);
-        downloadFile = (Button) findViewById(R.id.downloadFile);
-        chatButton = (FloatingActionButton) findViewById(R.id.floating_chat);
-        fileButton = (FloatingActionButton) findViewById(R.id.floating_file_upload);
-        imageButton = (FloatingActionButton) findViewById(R.id.floating_image_upload);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerProgress = (ProgressBar) findViewById(R.id.progress_recycler);
-//        mLayoutManager = new LinearLayoutManager(getActivity());
+        chooseImg = findViewById(R.id.chooseImg);
+        uploadImg = findViewById(R.id.uploadImg);
+        downloadImg = findViewById(R.id.downloadImg);
+        chooseFile = findViewById(R.id.chooseFile);
+        uploadFile = findViewById(R.id.uploadFile);
+        downloadFile = findViewById(R.id.downloadFile);
+        chatButton = findViewById(R.id.floating_chat);
+        fileButton = findViewById(R.id.floating_file_upload);
+        imageButton = findViewById(R.id.floating_image_upload);
+        mRecyclerView = findViewById(R.id.recycler_view);
+        recyclerProgress = findViewById(R.id.progress_recycler);
         mGridLayoutManager = new GridLayoutManager(UserHomeActivity.this, 2);
         mRecyclerView.setHasFixedSize(false);
-//        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         fetchFiles();
-//        saveUserOnGroup();
 
         //getting the group on which the user is currently logged in
         // fetching value from sharedpreference
@@ -127,7 +119,6 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-
                 if (user == null) {
                     // user auth state is changed - user is null
                     // launch login activity
@@ -137,7 +128,6 @@ public class UserHomeActivity extends AppCompatActivity {
             }
         };
 
-        // Creating new user node, which returns the unique key value
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userName = currentUser.getDisplayName();
         userEmail = currentUser.getEmail();
@@ -146,6 +136,7 @@ public class UserHomeActivity extends AppCompatActivity {
         Log.i("UserHomeActivity : ", "User Details: " + userName + " " + userEmail + " " + userProvider);
         ModuleParcelable.setEmail(userEmail);
 
+        // for chat within the group
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,10 +146,10 @@ public class UserHomeActivity extends AppCompatActivity {
             }
         });
 
+        // for uploading images
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(UserHomeActivity.this, AlbumSelectActivity.class);
                 //set limit on number of images that can be selected, default is 10
                 intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
@@ -167,14 +158,7 @@ public class UserHomeActivity extends AppCompatActivity {
             }
         });
 
-//        downloadImg.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(UserHomeActivity.this, DownloadImagesActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-
+        // for uploading files
         fileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,6 +174,7 @@ public class UserHomeActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
 
+                // version specfic
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
                     if (mimeTypes.length > 0) {
@@ -203,18 +188,11 @@ public class UserHomeActivity extends AppCompatActivity {
                     intent.setType(mimeTypesStr.substring(0, mimeTypesStr.length() - 1));
                 }
                 startActivityForResult(Intent.createChooser(intent, "ChooseFile"), 0);
-
             }
         });
-//        downloadFile.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(UserHomeActivity.this, DownloadFileActivity.class);
-//                startActivity(intent);
-//            }
-//        });
     }
 
+    // for returning the selected paths of files and images
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
@@ -232,9 +210,9 @@ public class UserHomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "No file chosen", Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
+    // uploading images
     private void uploadImages() {
         Toast.makeText(UserHomeActivity.this, "Uploading....", Toast.LENGTH_SHORT).show();
         if (images != null) {
@@ -261,11 +239,6 @@ public class UserHomeActivity extends AppCompatActivity {
                                     ObjectModule objectModule = new ObjectModule(title, email, photoUrl, type, userGroup);
                                     userId = fileDatabaseReference.push().getKey();
                                     fileDatabaseReference.child(userId).setValue(objectModule);
-
-//                                    // saving user to group
-//                                    groupUsersModule = new GroupUsersModule(userEmail, userGroup);
-//                                    userId = groupDataRef.push().getKey();
-//                                    groupDataRef.child(userId).setValue(groupUsersModule);
                                 }
                                 Toast.makeText(UserHomeActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                             }
@@ -280,6 +253,7 @@ public class UserHomeActivity extends AppCompatActivity {
         }
     }
 
+    // uploading files
     private void uploadFile() {
         if (documentPath != null) {
             Toast.makeText(UserHomeActivity.this, "Uploading....", Toast.LENGTH_SHORT).show();
@@ -302,11 +276,6 @@ public class UserHomeActivity extends AppCompatActivity {
                                 ObjectModule objectModule = new ObjectModule(title, email, fileUrl, type, userGroup);
                                 userId = fileDatabaseReference.push().getKey();
                                 fileDatabaseReference.child(userId).setValue(objectModule);
-
-//                                // saving user to group
-//                                groupUsersModule = new GroupUsersModule(userEmail, userGroup);
-//                                userId = groupDataRef.push().getKey();
-//                                groupDataRef.child(userId).setValue(groupUsersModule);
                             }
                             Toast.makeText(UserHomeActivity.this, "Upload successful", Toast.LENGTH_SHORT).show();
                         }
@@ -320,6 +289,7 @@ public class UserHomeActivity extends AppCompatActivity {
         }
     }
 
+    // fetching files from the Firebase Storage
     private void fetchFiles() {
         final String userId = databaseReference.push().getKey();
         DatabaseReference info = databaseReference.child("FileStorage");
@@ -340,9 +310,8 @@ public class UserHomeActivity extends AppCompatActivity {
                     if (userGroup.equals(objectModule.getUserGroup())) {
                         moduleList.add(objectModule);
                     }
-//                    Log.i("DownloadImageActivity", "list: " + moduleList);
                 }
-                MyRecyclerViewAdapter mAdapter = new MyRecyclerViewAdapter(UserHomeActivity.this, moduleList);
+                MyFilesViewAdapter mAdapter = new MyFilesViewAdapter(UserHomeActivity.this, moduleList);
                 mRecyclerView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
                 recyclerProgress.setVisibility(View.GONE);
@@ -354,56 +323,6 @@ public class UserHomeActivity extends AppCompatActivity {
             }
         });
     }
-
-
-//    private void saveUserOnGroup() {
-//        while(i<1) {
-//            groupDataRef.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//            i=i+1;
-//        }
-
-//        groupDataRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                    if (data.child("user").equals(userGroup) && data.child("group").equals(userEmail)) {
-//                        //do ur stuff
-//                    } else {
-//                        //do something
-//                        groupDataRef.addValueEventListener(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(DataSnapshot dataSnapshot) {
-//                                groupUsersModule = new GroupUsersModule(userGroup, userEmail);
-//                                userId = groupDataRef.push().getKey();
-//                                groupDataRef.child(userId).setValue(groupUsersModule);
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(DatabaseError databaseError) {
-//
-//                            }
-//                        });
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
-
 
     //menu initialization
     @Override
@@ -431,6 +350,7 @@ public class UserHomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // signing out users
     private void SignOutUser() {
         auth.signOut();
         startActivity(new Intent(UserHomeActivity.this, SignInActivity.class));
