@@ -41,11 +41,14 @@ import java.util.ArrayList;
 
 /**
  * Created by Amrit on 12/4/2017.
- * User's Home Page inside the group.
- * The contents images, videos, songs, documents shared within the group are displayed on this activity.
+ * This is a recyclerview layout home page of the user in the project "Smart Cloud Storage' which can be found at
+ * https://github.com/amrit015/Smart-Cloud-Storage
+ * Firebase Storage has been used for storing the user contents, and references to those contents has been stored in the
+ * Firebase Database; images, videos, songs, documents shared within the group are displayed on this activity on cardview
+ * on the recyclerview layout
  */
 
-public class UserHomeActivity extends AppCompatActivity {
+public class UserHomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button chooseImg, uploadImg, downloadImg;
     Button chooseFile, uploadFile, downloadFile;
@@ -56,12 +59,14 @@ public class UserHomeActivity extends AppCompatActivity {
     StorageReference storageRef = storage.getReferenceFromUrl("gs://smartcloudstorage-017.appspot.com");
     //creating reference to firebase database
     FirebaseDatabase database = FirebaseDatabase.getInstance();
+    // link to the Firebase Database
+    String linkDb = "https://smartcloudstorage-017.firebaseio.com";
     // for upload
-    DatabaseReference fileDatabaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com" + "/FileStorage");
+    DatabaseReference fileDatabaseReference = database.getReferenceFromUrl(linkDb + "/FileStorage");
     // for download
-    DatabaseReference databaseReference = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com");
+    DatabaseReference databaseReference = database.getReferenceFromUrl(linkDb);
     // for saving users into group
-    DatabaseReference groupDataRef = database.getReferenceFromUrl("https://smartcloudstorage-017.firebaseio.com" + "/Group_Authentication");
+    DatabaseReference groupDataRef = database.getReferenceFromUrl(linkDb + "/Group_Authentication");
 
     private RecyclerView mRecyclerView;
     GridLayoutManager mGridLayoutManager;
@@ -86,12 +91,6 @@ public class UserHomeActivity extends AppCompatActivity {
         //firebase offline mode
 //        database.setPersistenceEnabled(true);
 
-        chooseImg = findViewById(R.id.chooseImg);
-        uploadImg = findViewById(R.id.uploadImg);
-        downloadImg = findViewById(R.id.downloadImg);
-        chooseFile = findViewById(R.id.chooseFile);
-        uploadFile = findViewById(R.id.uploadFile);
-        downloadFile = findViewById(R.id.downloadFile);
         chatButton = findViewById(R.id.floating_chat);
         fileButton = findViewById(R.id.floating_file_upload);
         imageButton = findViewById(R.id.floating_image_upload);
@@ -121,13 +120,14 @@ public class UserHomeActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user == null) {
                     // user auth state is changed - user is null
-                    // launch login activity
+                    // launch sign in activity
                     startActivity(new Intent(UserHomeActivity.this, SignInActivity.class));
                     finish();
                 }
             }
         };
 
+        // get current user and set the username and email for use later
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         String userName = currentUser.getDisplayName();
         userEmail = currentUser.getEmail();
@@ -137,59 +137,77 @@ public class UserHomeActivity extends AppCompatActivity {
         ModuleParcelable.setEmail(userEmail);
 
         // for chat within the group
-        chatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UserHomeActivity.this, ChatServiceActivity.class);
-                intent.putExtra("user", userEmail);
-                startActivity(intent);
-            }
-        });
+        chatButton.setOnClickListener(this);
 
         // for uploading images
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserHomeActivity.this, AlbumSelectActivity.class);
-                //set limit on number of images that can be selected, default is 10
-                intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
-                startActivityForResult(intent, Constants.REQUEST_CODE);
-
-            }
-        });
+        imageButton.setOnClickListener(this);
 
         // for uploading files
-        fileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String[] mimeTypes =
-                        {"application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .doc & .docx
-                                "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .ppt & .pptx
-                                "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xls & .xlsx
-                                "text/plain",
-                                "image/*", "audio/*", "video/*",
-                                "application/pdf",
-                                "application/zip"};
+        fileButton.setOnClickListener(this);
+    }
 
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
+    // click events
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.floating_chat:
+                groupMessaging();
+                break;
+            case R.id.floating_image_upload:
+                groupImageUpload();
+                break;
+            case R.id.floating_file_upload:
+                groupFileUpload();
+                break;
+            default:
+                break;
+        }
+    }
 
-                // version specfic
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
-                    if (mimeTypes.length > 0) {
-                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    }
-                } else {
-                    String mimeTypesStr = "";
-                    for (String mimeType : mimeTypes) {
-                        mimeTypesStr += mimeType + "|";
-                    }
-                    intent.setType(mimeTypesStr.substring(0, mimeTypesStr.length() - 1));
-                }
-                startActivityForResult(Intent.createChooser(intent, "ChooseFile"), 0);
+    // starting activity for result to fetch the files from the device storage
+    private void groupFileUpload() {
+        // defining extensions allowed
+        String[] mimeTypes =
+                {"application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .doc & .docx
+                        "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .ppt & .pptx
+                        "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xls & .xlsx
+                        "text/plain",
+                        "image/*", "audio/*", "video/*",
+                        "application/pdf",
+                        "application/zip"};
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // version specfic
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
+            if (mimeTypes.length > 0) {
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
             }
-        });
+        } else {
+            String mimeTypesStr = "";
+            for (String mimeType : mimeTypes) {
+                mimeTypesStr += mimeType + "|";
+            }
+            intent.setType(mimeTypesStr.substring(0, mimeTypesStr.length() - 1));
+        }
+        startActivityForResult(Intent.createChooser(intent, "ChooseFile"), 0);
+    }
+
+    // starting activity for result to fetch the images from the device storage
+    private void groupImageUpload() {
+        Intent intent = new Intent(UserHomeActivity.this, AlbumSelectActivity.class);
+        //set limit on number of images that can be selected, default is 10
+        intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 10);
+        startActivityForResult(intent, Constants.REQUEST_CODE);
+    }
+
+    // starting another activity to open chat
+    private void groupMessaging() {
+        Intent intent = new Intent(UserHomeActivity.this, ChatServiceActivity.class);
+        intent.putExtra("user", userEmail);
+        startActivity(intent);
     }
 
     // for returning the selected paths of files and images
@@ -198,6 +216,7 @@ public class UserHomeActivity extends AppCompatActivity {
         if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             //The array list has the image paths of the selected images
             images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+            // upload images
             uploadImages();
         }
         if (requestCode == 0 && resultCode == RESULT_OK && data != null && data.getData() != null) {
@@ -253,7 +272,7 @@ public class UserHomeActivity extends AppCompatActivity {
         }
     }
 
-    // uploading files
+    // uploading files to different folder other than images in the Firebase Storage
     private void uploadFile() {
         if (documentPath != null) {
             Toast.makeText(UserHomeActivity.this, "Uploading....", Toast.LENGTH_SHORT).show();
@@ -327,7 +346,6 @@ public class UserHomeActivity extends AppCompatActivity {
     //menu initialization
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -335,9 +353,6 @@ public class UserHomeActivity extends AppCompatActivity {
     //menu selection
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
 
         // using switch statement to implement actions for each menuItem
         switch (item.getItemId()) {
@@ -356,5 +371,4 @@ public class UserHomeActivity extends AppCompatActivity {
         startActivity(new Intent(UserHomeActivity.this, SignInActivity.class));
         finish();
     }
-
 }
